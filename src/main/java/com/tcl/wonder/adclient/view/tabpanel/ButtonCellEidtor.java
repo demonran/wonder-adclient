@@ -1,4 +1,4 @@
-package com.tcl.wonder.adclient.view;
+package com.tcl.wonder.adclient.view.tabpanel;
 
 import java.awt.Component;
 

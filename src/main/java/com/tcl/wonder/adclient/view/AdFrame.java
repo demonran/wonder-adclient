@@ -10,12 +10,21 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import com.tcl.wonder.adclient.view.tabpanel.BatchInsertPane;
+import com.tcl.wonder.adclient.view.tabpanel.InsertAdPane;
+import com.tcl.wonder.adclient.view.tabpanel.ListAdPane;
+import com.tcl.wonder.adclient.view.tabpanel.UpdateAdPane;
+
 public class AdFrame extends JFrame
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private UpdateAdPane updateAdPane;
+	
+	private JTabbedPane tab;
 	
 	public AdFrame()
 	{
@@ -25,7 +34,6 @@ public class AdFrame extends JFrame
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 				| UnsupportedLookAndFeelException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  
          JFrame.setDefaultLookAndFeelDecorated(true);  
@@ -37,32 +45,43 @@ public class AdFrame extends JFrame
 		layoutUI();
 		
 		setVisible(true);
+		setGlassPane(new InfiniteProgressPanel());
 	}
 	
 	 private void layoutUI(){
 
 		  //对象实例化
-		  JTabbedPane tab = new JTabbedPane(JTabbedPane.TOP); 
+		  tab = new JTabbedPane(JTabbedPane.TOP); 
 		  //容器
 		  Container container = this.getLayeredPane();
 		  //对象化面板
 		  JPanel combop = new JPanel();
-		  JPanel p1 = new ListAdPane();
-		  JPanel p2 = new AddAdPane();
-		  JPanel p3 = new JPanel();
-		  JPanel p4 = new JPanel();
+		  JPanel p1 = new ListAdPane(this);
+		  JPanel p2 = new InsertAdPane();
+		  JPanel p3 = new BatchInsertPane();
+		  updateAdPane = new UpdateAdPane();
 
 
 		  tab.add(p1,"Select");
-		  tab.add(p2,"Updata");
-		  tab.add(p3,"Inserte");
-		  tab.add(p4,"Delete");
+		  tab.add(p2,"Insert");
+		  tab.add(p3,"BatchInsert");
+		  tab.add(updateAdPane,"Updata");
 		  
 		  combop.add(new JLabel("广告信息系统"));
 		  
 		  container.setLayout(new BorderLayout());
 		  container.add(combop,BorderLayout.NORTH);
 		  container.add(tab,BorderLayout.CENTER);
+	 }
+	 
+	 public void setSelectTab(int index)
+	 {
+		 tab.setSelectedIndex(index);
+	 }
+	 
+	 public UpdateAdPane getUpdateAdPane()
+	 {
+		 return updateAdPane;
 	 }
 	 
 	 public static void main(String[] args)

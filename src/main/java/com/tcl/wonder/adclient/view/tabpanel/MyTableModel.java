@@ -1,9 +1,9 @@
-package com.tcl.wonder.adclient.view;
+package com.tcl.wonder.adclient.view.tabpanel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.table.AbstractTableModel;
 
 import org.slf4j.Logger;
@@ -22,13 +22,17 @@ public class MyTableModel extends  AbstractTableModel
 	private static Logger logger = LoggerFactory.getLogger(MyTableModel.class);
 	
 	 //单元格元素类型  
-    private Class<?> []cellType={String.class,String.class,String.class,String.class,String.class,String.class,JButton.class};  
+    private Class<?> []cellType={JLabel.class,String.class,String.class,String.class,Integer.class,String.class,String.class};  
     //表头  
     private String[] columnNames;  
     //模拟数据  
     private List<List<Object>> data;  
     
-    
+    public MyTableModel(String[] columnNames)
+	{
+		data = new ArrayList<List<Object>>();
+		this.columnNames = columnNames;
+	}
 
     public MyTableModel(String[] columnNames, List<List<Object>> data)
 	{
@@ -94,6 +98,7 @@ public class MyTableModel extends  AbstractTableModel
 	public void remove(int row)
 	{
 		data.remove(row);
+		logger.debug("remove row  {}",row);
 		fireTableRowsInserted(data.size(),data.size());
 	}
 	
@@ -111,15 +116,15 @@ public class MyTableModel extends  AbstractTableModel
 	}
 	
 	 private static List<List<Object>> convertToList(Object[][] anArray) {
-	        if (anArray == null) {
-	            return null;
-	        }
-	        List<List<Object>> list = new ArrayList<List<Object>>(anArray.length);
-	        for (Object[] o : anArray) {
-	        	list.add(convertToList(o));
-	        }
-	        return list;
-	    }
+        if (anArray == null) {
+            return null;
+        }
+        List<List<Object>> list = new ArrayList<List<Object>>(anArray.length);
+        for (Object[] o : anArray) {
+        	list.add(convertToList(o));
+        }
+        return list;
+    }
 	
 
 }

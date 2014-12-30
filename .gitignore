@@ -1,1 +1,12 @@
 /target/
+
+.settings
+.classpath
+.project
+log.roo
+target
+bin
+/.apt_generated
+.idea
+rstudio.iml
+*.iml

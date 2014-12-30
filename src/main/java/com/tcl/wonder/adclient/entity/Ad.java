@@ -97,4 +97,13 @@ public class Ad
 		this.videoname = videoname;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Ad [id=" + id + ", name=" + name + ", logo=" + logo + ", duration=" + duration
+				+ ", info=" + info + ", videoname=" + videoname + "]";
+	}
+
+	
+	
 }

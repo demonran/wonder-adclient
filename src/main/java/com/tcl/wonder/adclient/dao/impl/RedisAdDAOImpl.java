@@ -18,6 +18,7 @@ import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
 
 import com.tcl.wonder.adclient.dao.AdDAO;
+import com.tcl.wonder.adclient.dao.Cache;
 import com.tcl.wonder.adclient.entity.Ad;
 
 public class RedisAdDAOImpl implements AdDAO
@@ -59,32 +60,40 @@ public class RedisAdDAOImpl implements AdDAO
 		hash.put("logo", ad.getLogo());
 		hash.put("info", ad.getInfo());
 		hash.put("duration", String.valueOf(ad.getDuration()));
+		hash.put("videoname", ad.getVideoname());
 		sharedJedis.hmset("ad_"+ad.getId(), hash);
+		Cache.setDatabaseHasUpdate(true);
 		return true;
 	}
 	
 	@Override
 	public boolean delete(Ad ad)
 	{
-		sharedJedis.del(ad.getId());
+		sharedJedis.del("ad_"+ad.getId());
+		Cache.setDatabaseHasUpdate(true);
 		return true;
 	}
 	
 	@Override
 	public List<Ad> findAll()
 	{
-		List<Ad> ads = new ArrayList<Ad>();
-		Collection<Jedis> allShards = sharedJedis.getAllShards();
-		Set<String> keys = new HashSet<String>();
-		for(Jedis jedis : allShards)
+		List<Ad> ads = Cache.getAds();
+		if(ads == null)
 		{
-			keys.addAll(jedis.keys("ad_*"));
-		}
-		for(String key : keys)
-		{
-			Map<String,String> adMap = sharedJedis.hgetAll(key);
-			logger.debug(adMap.toString());
-			ads.add(new Ad(adMap));
+			ads = new ArrayList<Ad>();
+			Collection<Jedis> allShards = sharedJedis.getAllShards();
+			Set<String> keys = new HashSet<String>();
+			for(Jedis jedis : allShards)
+			{
+				keys.addAll(jedis.keys("ad_*"));
+			}
+			for(String key : keys)
+			{
+				Map<String,String> adMap = sharedJedis.hgetAll(key);
+				logger.debug(adMap.toString());
+				ads.add(new Ad(adMap));
+			}
+			Cache.cacheAd(ads);
 		}
 		
 		return ads;
