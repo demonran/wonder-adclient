@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -100,6 +99,10 @@ public class BatchInsertPane extends JPanel
 		adPanel.add(xmlpathFlied);
 		gridbag.setConstraints(xmlpathButton, cButton);
 		adPanel.add(xmlpathButton);
+		
+		JPanel progressPabel = new JPanel();
+		gridbag.setConstraints(progressPabel, UIUtils.getGridBagConstraints(0, 0, 0, 1));
+		adPanel.add(progressPabel);
 		
 		JPanel operationPanel = new JPanel();
 		

@@ -1,7 +1,7 @@
 package com.tcl.wonder.adclient.view;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -46,14 +46,14 @@ public class AdFrame extends JFrame
 		
 		setVisible(true);
 		setGlassPane(new InfiniteProgressPanel());
+//		System.out.println(this.getFont());
+//		this.setFont(new Font("楷体",Font.PLAIN,12));
 	}
 	
 	 private void layoutUI(){
 
 		  //对象实例化
 		  tab = new JTabbedPane(JTabbedPane.TOP); 
-		  //容器
-		  Container container = this.getLayeredPane();
 		  //对象化面板
 		  JPanel combop = new JPanel();
 		  JPanel p1 = new ListAdPane(this);
@@ -67,11 +67,14 @@ public class AdFrame extends JFrame
 		  tab.add(p3,"BatchInsert");
 		  tab.add(updateAdPane,"Updata");
 		  
-		  combop.add(new JLabel("广告信息系统"));
 		  
-		  container.setLayout(new BorderLayout());
-		  container.add(combop,BorderLayout.NORTH);
-		  container.add(tab,BorderLayout.CENTER);
+		  JLabel title = new JLabel("广告信息系统");
+		  title.setFont(new Font("楷体", Font.BOLD, 24));
+		  combop.add(title);
+		  
+		  this.setLayout(new BorderLayout());
+		  this.add(combop,BorderLayout.NORTH);
+		  this.add(tab,BorderLayout.CENTER);
 	 }
 	 
 	 public void setSelectTab(int index)

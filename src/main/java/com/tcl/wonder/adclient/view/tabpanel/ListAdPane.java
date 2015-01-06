@@ -78,6 +78,8 @@ public class ListAdPane extends JPanel
 		table.setGridColor(Color.black);// 设置网格线的颜色
 		table.setBackground(Color.lightGray);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.setSelectionBackground(Color.GREEN);// 设置所选择行的背景色
+		table.setSelectionForeground(Color.BLUE);// 设置所选择行的前景色
 		
 		TableColumnModel columnModel = table.getColumnModel();
 		
@@ -107,20 +109,15 @@ public class ListAdPane extends JPanel
 		operationPanel.add(selectFiled);
 		operationPanel.add(selelctButton);
 		operationPanel.add(refreshButton);
-//		operationPanel.setLayout(null);
 		
 		
 		
 		this.setLayout(new BorderLayout()); 
 		this.setOpaque(true);
 		this.add(operationPanel,BorderLayout.NORTH);
-//		operationPanel.add(addButton);
-//		operationPanel.add(resetButton);
 
 		JScrollPane pane = new JScrollPane(table);
 
-//		this.setPreferredSize(null);
-//		this.setBackground(Color.black);
 		this.add(pane,BorderLayout.CENTER);
 
 		initData();
@@ -130,7 +127,6 @@ public class ListAdPane extends JPanel
 	private void initData()
 	{
 		uploadTable();
-		
 		selectFiled.setupAutoCompleteItem(adServer.getAllAdId());
 	}
 	
@@ -142,6 +138,23 @@ public class ListAdPane extends JPanel
 	
 	private void addEvent()
 	{
+		
+		//悬浮提示单元格的值 
+		table.addMouseMotionListener(new MouseAdapter(){
+			public void mouseMoved(MouseEvent e) {
+				int row=table.rowAtPoint(e.getPoint());
+				int col=table.columnAtPoint(e.getPoint());
+				if(row>-1 && col>-1){
+					table.setRowSelectionInterval(row, row);
+					Object value=table.getValueAt(row, col);
+					if(null!=value && !"".equals(value))
+						table.setToolTipText(value.toString());//悬浮显示单元格内容
+					else
+						table.setToolTipText(null);//关闭提示
+				}
+			}
+		});
+		
 		table.addMouseListener(new MouseAdapter()
 		{
 			@Override
@@ -150,22 +163,12 @@ public class ListAdPane extends JPanel
 				selectedRow = table.rowAtPoint(e.getPoint());
 				logger.debug("selectedRow = {}", selectedRow);
 				
-				table.setSelectionBackground(Color.white);// 设置所选择行的背景色
-				table.setSelectionForeground(Color.red);// 设置所选择行的前景色
-
 				int bindex = e.getButton();
 				if (bindex == MouseEvent.BUTTON3)
 				{
 					popupMenu.show(table, e.getX(), e.getY());
 				}
 				super.mousePressed(e);
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e)
-			{
-				// TODO Auto-generated method stub
-				super.mouseEntered(e);
 			}
 
 		});
@@ -250,5 +253,6 @@ public class ListAdPane extends JPanel
 		Ad ad = new Ad(id, name, logo, duration, info, videoname);
 		return ad;
 	}
+	
 
 }
