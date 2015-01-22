@@ -23,7 +23,7 @@ public class RedisChannelAdDAOImpl implements ChannelAdDAO
 		jedisPoolConfig.setTestOnBorrow(true);
 		jedisPoolConfig.setMaxWaitMillis(300000);
 		
-		JedisShardInfo shardInfo = new JedisShardInfo("127.0.0.1", 6379, 300000,"instance:01");
+		JedisShardInfo shardInfo = new JedisShardInfo("114.215.148.2", 6379, 300000,"instance:01");
 		
 		List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
 		shards.add(shardInfo);

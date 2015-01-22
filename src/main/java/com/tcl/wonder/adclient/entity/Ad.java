@@ -1,9 +1,16 @@
 package com.tcl.wonder.adclient.entity;
 
+import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
-public class Ad
+public class Ad implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private String id;
 
 	private String name;
@@ -14,27 +21,41 @@ public class Ad
 
 	private String info;
 
-	private String videoname;
+	private Date updatetime;
 
 	public Ad()
 	{
 	}
+	
+	
 
-	public Ad(String id, String name, String logo, int duration, String info, String videoname)
+	public Ad(String id, String name, String logo, int duration, String info)
+	{
+		super();
+		this.id = id;
+		this.name = name;
+		this.logo = logo;
+		this.duration = duration;
+		this.info = info;
+	}
+
+
+
+	public Ad(String id, String name, String logo, int duration, String info, Date updatetime)
 	{
 		this.id = id;
 		this.name = name;
 		this.logo = logo;
 		this.duration = duration;
 		this.info = info;
-		this.videoname = videoname;
+		this.updatetime = updatetime;
 	}
 
 	public Ad(Map<String, String> adMap)
 	{
 		this(adMap.get("id"), adMap.get("name"), adMap.get("logo"),adMap
 				.get("duration") ==null?0:Integer.valueOf(adMap
-				.get("duration")), adMap.get("info"), adMap.get("videoname"));
+				.get("duration")), adMap.get("info"), new Date(Long.valueOf(adMap.get("updatetime"))));
 	}
 
 	public String getId()
@@ -87,22 +108,26 @@ public class Ad
 		this.info = info;
 	}
 
-	public String getVideoname()
+
+
+	public Date getUpdatetime()
 	{
-		return videoname;
+		return updatetime;
 	}
 
-	public void setVideoname(String videoname)
+	public void setUpdatetime(Date updatetime)
 	{
-		this.videoname = videoname;
+		this.updatetime = updatetime;
 	}
 
 	@Override
 	public String toString()
 	{
 		return "Ad [id=" + id + ", name=" + name + ", logo=" + logo + ", duration=" + duration
-				+ ", info=" + info + ", videoname=" + videoname + "]";
+				+ ", info=" + info + ", updatetime=" + updatetime + "]";
 	}
+
+
 
 	
 	

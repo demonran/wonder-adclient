@@ -12,37 +12,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.ShardedJedis;
-import redis.clients.jedis.ShardedJedisPool;
 
 import com.tcl.wonder.adclient.dao.AdDAO;
-import com.tcl.wonder.adclient.dao.Cache;
+import com.tcl.wonder.adclient.dao.WonderCache;
+import com.tcl.wonder.adclient.dao.connection.DBConnectionManager;
+import com.tcl.wonder.adclient.dao.connection.NConnection;
 import com.tcl.wonder.adclient.entity.Ad;
 
 public class RedisAdDAOImpl implements AdDAO
 {
 	
-	private ShardedJedis sharedJedis;
+	private NConnection sharedJedis;
 	
 	private static Logger logger = LoggerFactory.getLogger(RedisAdDAOImpl.class);
 	
-	public RedisAdDAOImpl()
+	private static String AD_PREFIX = "ADINFO_*";
+	
+	public RedisAdDAOImpl(String host)
 	{
-		JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-		jedisPoolConfig.setMaxTotal(1000);
-		jedisPoolConfig.setMinIdle(100);
-		jedisPoolConfig.setTestOnBorrow(true);
-		jedisPoolConfig.setMaxWaitMillis(300000);
-		
-		JedisShardInfo shardInfo = new JedisShardInfo("127.0.0.1", 6379, 300000,"instance:01");
-		
-		List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
-		shards.add(shardInfo);
-		
-		ShardedJedisPool shardedJedisPool = new ShardedJedisPool(jedisPoolConfig,shards);
-		sharedJedis = shardedJedisPool.getResource();
+		sharedJedis = DBConnectionManager.getInstance().getConnection("ads");
 	}
 	
 	@Override
@@ -60,43 +48,75 @@ public class RedisAdDAOImpl implements AdDAO
 		hash.put("logo", ad.getLogo());
 		hash.put("info", ad.getInfo());
 		hash.put("duration", String.valueOf(ad.getDuration()));
-		hash.put("videoname", ad.getVideoname());
-		sharedJedis.hmset("ad_"+ad.getId(), hash);
-		Cache.setDatabaseHasUpdate(true);
+		hash.put("updatetime", String.valueOf(ad.getUpdatetime().getTime()));
+		sharedJedis.hmset(AD_PREFIX+ad.getId(), hash);
+		WonderCache.setDatabaseHasUpdate(true);
 		return true;
 	}
 	
 	@Override
 	public boolean delete(Ad ad)
 	{
-		sharedJedis.del("ad_"+ad.getId());
-		Cache.setDatabaseHasUpdate(true);
+		return delete(ad.getId());
+	}
+	
+	@Override
+	public boolean delete(String id)
+	{
+		sharedJedis.del(AD_PREFIX+id);
+		WonderCache.setDatabaseHasUpdate(true);
 		return true;
 	}
 	
 	@Override
 	public List<Ad> findAll()
 	{
-		List<Ad> ads = Cache.getAds();
+		List<Ad> ads = WonderCache.getAds();
 		if(ads == null)
 		{
+			long tt = System.currentTimeMillis();
 			ads = new ArrayList<Ad>();
 			Collection<Jedis> allShards = sharedJedis.getAllShards();
 			Set<String> keys = new HashSet<String>();
 			for(Jedis jedis : allShards)
 			{
-				keys.addAll(jedis.keys("ad_*"));
+				keys.addAll(jedis.keys(AD_PREFIX));
 			}
 			for(String key : keys)
 			{
 				Map<String,String> adMap = sharedJedis.hgetAll(key);
-				logger.debug(adMap.toString());
 				ads.add(new Ad(adMap));
 			}
-			Cache.cacheAd(ads);
+			logger.debug("ad info size:{} ,get all info cost time :{}ms" ,keys.size(),System.currentTimeMillis() -tt);
+			WonderCache.cacheAd(ads);
 		}
 		
 		return ads;
+	}
+	
+	@Override
+	public Map<String,Ad> findAlltoMap()
+	{
+		Map<String,Ad> adsMap = WonderCache.getAdsMap();
+		if(adsMap == null)
+		{
+			adsMap = new HashMap<String,Ad>();
+			Collection<Jedis> allShards = sharedJedis.getAllShards();
+			Set<String> keys = new HashSet<String>();
+			for(Jedis jedis : allShards)
+			{
+				keys.addAll(jedis.keys(AD_PREFIX));
+			}
+			for(String key : keys)
+			{
+				Map<String,String> adMap = sharedJedis.hgetAll(key);
+				Ad ad = new Ad(adMap);
+				adsMap.put(ad.getId(),new Ad(adMap));
+			}
+			logger.debug("ad info size: " +keys.size());
+			WonderCache.cacheAdMap(adsMap);
+		}
+		return adsMap;
 	}
 	
 	@Override
@@ -105,5 +125,16 @@ public class RedisAdDAOImpl implements AdDAO
 		Map<String,String> adMap = sharedJedis.hgetAll(id);
 		return new Ad(adMap);
 	}
+
+	@Override
+	public boolean addAll(List<Ad> ads)
+	{	
+		for(Ad ad : ads)
+		{
+			add(ad);
+		}
+		return true;
+	}
+	
 
 }

@@ -11,6 +11,7 @@ private String url      =""; //数据库url
 private String username =""; //用户名 
 private String password =""; //密码 
 private int maxconn  =0; //最大连接数 
+private String host;
 /** 
   * 
   */ 
@@ -106,5 +107,15 @@ public String getUsername() {
   */ 
 public void setUsername(String username) { 
   this.username = username; 
+}
+public String getHost()
+{
+	return host;
+}
+public void setHost(String host)
+{
+	this.host = host;
 } 
+
+
 }

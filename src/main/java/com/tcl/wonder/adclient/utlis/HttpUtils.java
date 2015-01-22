@@ -3,25 +3,16 @@ package com.tcl.wonder.adclient.utlis;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
-
-import sun.misc.IOUtils;
 
 public class HttpUtils
 {
@@ -70,11 +61,11 @@ public class HttpUtils
 	      
 	        
 	      
-	        public static void postFile(String urlPath,String videoFile, String metaFile)
-	          throws IOException
-	        {
+    public static boolean postFile(String urlPath,String videoFile, String metaFile)throws IOException
+	{
 	     URL url = new URL(urlPath);
 	     HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+	     conn.setConnectTimeout(10000);
 	     conn.setDoOutput(true);
 	     conn.setRequestMethod("POST");
 	          
@@ -92,12 +83,13 @@ public class HttpUtils
 	     System.out.println(responseCode);
 	     if (responseCode == 200) {
 	       System.out.println("Upload Successful!");
-	          }
-	          else {
+	       return true;
+	     }
+	     else {
 	       System.out.println("Upload Fail!");
-	          }
-	     out.close();
-	        }
+	       return false;
+	     }
+    }
 	        
 	      
 	        public static void post(String urlPath,NameValuePair[] paras)

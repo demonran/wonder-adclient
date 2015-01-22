@@ -5,7 +5,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
+
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.JedisShardInfo;
+import redis.clients.jedis.ShardedJedis;
+import redis.clients.jedis.ShardedJedisPool;
 
 import com.tcl.wonder.adclient.utlis.Utilities;
 
@@ -13,7 +19,7 @@ public class DBConnectionPool
 {
 	private Connection con = null;
 	private int inUsed = 0; // 使用的连接数
-	private ArrayList<Connection> freeConnections = new ArrayList<Connection>();// 容器，空闲连接
+	private ArrayList<NConnection> freeConnections = new ArrayList<NConnection>();// 容器，空闲连接
 	private int minConn; // 最小连接数
 	private int maxConn; // 最大连接
 	private String name; // 连接池名字
@@ -22,6 +28,8 @@ public class DBConnectionPool
 	private String driver; // 驱动
 	private String user; // 用户名
 	public Timer timer; // 定时
+	private String type; //数据库类型
+	private String host;
 
 	/** 
   * 
@@ -57,7 +65,7 @@ public class DBConnectionPool
 	 * 
 	 * @param con
 	 */
-	public synchronized void freeConnection(Connection con)
+	public synchronized void freeConnection(NConnection con)
 	{
 		this.freeConnections.add(con);// 添加到空闲连接的末尾
 		this.inUsed--;
@@ -69,12 +77,12 @@ public class DBConnectionPool
 	 * @param timeout
 	 * @return
 	 */
-	public synchronized Connection getConnection(long timeout)
+	public synchronized NConnection getConnection(long timeout)
 	{
-		Connection con = null;
+		NConnection con = null;
 		if (this.freeConnections.size() > 0)
 		{
-			con = (Connection) this.freeConnections.get(0);
+			con = (NConnection) this.freeConnections.get(0);
 			if (con == null)
 				con = getConnection(timeout); // 继续获得连接
 		} else
@@ -103,13 +111,13 @@ public class DBConnectionPool
 	 * 
 	 * @return
 	 */
-	public synchronized Connection getConnection()
+	public synchronized NConnection getConnection()
 	{
-		Connection con = null;
+		NConnection con = null;
+		
 		if (this.freeConnections.size() > 0)
 		{
-			con = (Connection) this.freeConnections.get(0);
-			this.freeConnections.remove(0);// 如果连接分配出去了，就从空闲连接里删除
+			con =  freeConnections.remove(0);// 如果连接分配出去了，就从空闲连接里删除
 			if (con == null)
 				con = getConnection(); // 继续获得连接
 		} 
@@ -127,7 +135,10 @@ public class DBConnectionPool
 			this.inUsed++;
 			System.out.println("得到　" + this.name + "　的连接，现有" + inUsed + "个连接在使用!");
 		}
+			
+		
 		return con;
+		
 	}
 
 	/**
@@ -136,10 +147,10 @@ public class DBConnectionPool
 	 */
 	public synchronized void release()
 	{
-		Iterator<Connection> allConns = this.freeConnections.iterator();
+		Iterator<NConnection> allConns = this.freeConnections.iterator();
 		while (allConns.hasNext())
 		{
-			Connection con = (Connection) allConns.next();
+			NConnection con =  allConns.next();
 			try
 			{
 				con.close();
@@ -158,23 +169,46 @@ public class DBConnectionPool
 	 * 
 	 * @return
 	 */
-	private Connection newConnection()
+	private NConnection newConnection()
 	{
-		try
+		if("redis".equals(type))
 		{
-			Class.forName(driver);
-			con = DriverManager.getConnection(url, user, password);
+			JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+			jedisPoolConfig.setMaxTotal(1000);
+			jedisPoolConfig.setMinIdle(100);
+			jedisPoolConfig.setTestOnBorrow(true);
+			jedisPoolConfig.setMaxWaitMillis(300000);
 			
-		} catch (ClassNotFoundException e)
+			JedisShardInfo shardInfo = new JedisShardInfo(host, 6379, 300000,"instance:01");
+			
+			List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
+			shards.add(shardInfo);
+			
+			ShardedJedisPool shardedJedisPool = new ShardedJedisPool(jedisPoolConfig,shards);
+			ShardedJedis sharedJedis = shardedJedisPool.getResource();
+			
+			return new NConnection(sharedJedis);
+			
+		}else
 		{
-			e.printStackTrace();
-			System.out.println("sorry can't find db driver!");
-		} catch (SQLException e1)
-		{
-			e1.printStackTrace();
-			System.out.println("sorry can't create Connection!");
+			try
+			{
+				Class.forName(driver);
+				con = DriverManager.getConnection(url, user, password);
+				
+			} catch (ClassNotFoundException e)
+			{
+				e.printStackTrace();
+				System.out.println("sorry can't find db driver!");
+			} catch (SQLException e1)
+			{
+				e1.printStackTrace();
+				System.out.println("sorry can't create Connection!");
+			}
+			return new NConnection(con);
 		}
-		return con;
+		
+		
 
 	}
 
@@ -296,4 +330,28 @@ public class DBConnectionPool
 	{
 		this.user = user;
 	}
+
+	public String getType()
+	{
+		return type;
+	}
+
+	public void setType(String type)
+	{
+		this.type = type;
+	}
+
+	public String getHost()
+	{
+		return host;
+	}
+
+	public void setHost(String host)
+	{
+		this.host = host;
+	}
+	
+	
+	
+	
 }

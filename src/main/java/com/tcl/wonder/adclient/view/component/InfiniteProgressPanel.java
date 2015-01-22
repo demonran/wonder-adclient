@@ -1,4 +1,4 @@
-package com.tcl.wonder.adclient.view;
+package com.tcl.wonder.adclient.view.component;
 
 import java.awt.Color;
 import java.awt.Graphics;

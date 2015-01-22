@@ -1,7 +1,9 @@
 package com.tcl.wonder.adclient.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.tcl.wonder.adclient.entity.Ad;
 
@@ -10,17 +12,27 @@ import com.tcl.wonder.adclient.entity.Ad;
  * @author liuran
  *
  */
-public class Cache
+public class WonderCache
 {
 	private static List<Ad> ads = new ArrayList<Ad>();
+	
+	private static Map<String,Ad> adsMap = new HashMap<String,Ad>();
 	
 	private static long updateTime;
 	
 	private static boolean databaseHasUpdate = true;
 	
+	
 	public static void cacheAd(List<Ad> newAds)
 	{
 		ads = newAds;
+		databaseHasUpdate = false;
+		updateTime = System.currentTimeMillis();
+	}
+	
+	public static void cacheAdMap(Map<String,Ad> newAds)
+	{
+		adsMap = newAds;
 		databaseHasUpdate = false;
 		updateTime = System.currentTimeMillis();
 	}
@@ -31,11 +43,24 @@ public class Cache
 		{
 			ads = null;
 		}
-		if(System.currentTimeMillis() - updateTime >1000*60)
-		{
-			ads = null;
-		}
+//		if(System.currentTimeMillis() - updateTime >1000*60)
+//		{
+//			ads = null;
+//		}
 		return ads;
+	}
+	
+	public static Map<String,Ad> getAdsMap()
+	{
+		if(databaseHasUpdate)
+		{
+			adsMap = null;
+		}
+//		if(System.currentTimeMillis() - updateTime >1000*60)
+//		{
+//			adsMap = null;
+//		}
+		return adsMap;
 	}
 	
 	public static List<String> getAllAdId()
@@ -59,8 +84,24 @@ public class Cache
 
 	public static void setDatabaseHasUpdate(boolean databaseHasUpdate)
 	{
-		Cache.databaseHasUpdate = databaseHasUpdate;
+		WonderCache.databaseHasUpdate = databaseHasUpdate;
+	}
+
+	public static Ad getAdById(String adId)
+	{
+		if(databaseHasUpdate)
+		{
+			ads = null;
+		}
+		if(System.currentTimeMillis() - updateTime >1000*60)
+		{
+			return null;
+		}
+		return adsMap.get(adId);
 	}
 	
-	
+	public static void main(String[] args)
+	{
+		new WonderCache();
+	}
 }

@@ -1,33 +1,24 @@
 package com.tcl.wonder.adclient.utlis;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+import java.awt.Toolkit;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.ImageIcon;
 
 public class UIUtils
 {
 	
 	
     //上文
-    private final String strHtmlBegin = 
+    private static final String strHtmlBegin = 
            "<html>"
               + "<bgcolor color=#000080>"
-                  +"<font color=#0000cd >"
+                  +"<font size='5' color='red' style='font-family:楷体'>"
                   +"<b>";
     //下文
-    private final String strHtmlEnd = 
+    private static final String strHtmlEnd = 
                   "</b>"
                  +"</font>"
              +"</bgcolor>"
@@ -69,6 +60,57 @@ public class UIUtils
 		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(10, 5, 5, 10);
 		return c;
+	}
+	
+	public static String convertHtml(String str)
+	{
+		return strHtmlBegin + str + strHtmlEnd;
+	}
+	
+	/**
+	 * 
+	 * @param imageName
+	 * @return
+	 */
+	public static Image getImage(String imageName){
+		Image image = Toolkit.getDefaultToolkit().getImage("icon/"+imageName);
+		return image;
+		
+	}
+	
+	public static ImageIcon getImageIcon(String imageName){
+		ImageIcon imageIcon = new ImageIcon("icon/"+imageName);
+		return imageIcon;
+	}
+	
+	/**
+	 * 
+	 * @param imageName
+	 * @return
+	 */
+	public static ImageIcon getImageIcon(String imageName,int x,int y){
+		ImageIcon imageIcon=getImageIcon(imageName);
+		int width=imageIcon.getIconWidth();
+		int height=imageIcon.getIconHeight();
+		float xbili=(float) ((x*1.0)/width);
+		float ybili=(float) ((y*1.0)/height);
+		float bili=xbili>ybili?ybili:xbili;
+		int newwidth=(int) (width*bili);
+		int newheight=(int) (height*bili);
+		Image image=getImage(imageName,newwidth,newheight);
+		imageIcon.setImage(image);
+		return imageIcon;
+	}
+	
+	/**
+	 * 
+	 * @param imageName 
+	 * @return
+	 */
+	public static Image getImage(String imageName,int x,int y){
+		Image image = Toolkit.getDefaultToolkit().getImage("icon/"+imageName);
+		image = image.getScaledInstance(x,y, Image.SCALE_SMOOTH); 
+		return image;
 	}
 	
 

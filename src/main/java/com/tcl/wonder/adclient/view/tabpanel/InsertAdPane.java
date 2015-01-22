@@ -8,11 +8,14 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -21,15 +24,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.tcl.wonder.adclient.entity.Ad;
-import com.tcl.wonder.adclient.service.AdServerClient;
-import com.tcl.wonder.adclient.service.AdService;
+import com.tcl.wonder.adclient.entity.Video;
+import com.tcl.wonder.adclient.service.AdUploadService;
 import com.tcl.wonder.adclient.utlis.UIUtils;
+import com.tcl.wonder.adclient.view.AdFrame;
 /**
  * 插入面板类
  * @author liuran
  *
  */
-public class InsertAdPane extends JPanel
+public class InsertAdPane extends TabPanel
 {
 	
 	/**
@@ -40,7 +44,7 @@ public class InsertAdPane extends JPanel
 	private static Logger logger = LoggerFactory.getLogger(InsertAdPane.class);
 	
 	
-	private JTextField videopathFlied;
+	private JTextField updatetimeFlied;
 	
 	private JTextField metapathFlied;
 	
@@ -64,14 +68,13 @@ public class InsertAdPane extends JPanel
 	
 	private JLabel errorLabel;
 	
+	private AdUploadService adUploadService = AdUploadService.getInstance();
 	
-	private AdService  adService = new AdService();
+	private AdFrame adFrame;
 	
-	private AdServerClient client = new AdServerClient();
-	
-	public InsertAdPane()
+	public InsertAdPane(AdFrame adFrame)
 	{
-		logger.debug("add completely");
+		this.adFrame = adFrame;
 		layoutUI();
 	}
 
@@ -99,7 +102,7 @@ public class InsertAdPane extends JPanel
 		errorLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));
 		errorLabel.setForeground(Color.RED);
 		
-		videopathFlied = new JTextField();
+		updatetimeFlied = new JTextField();
 		metapathFlied = new JTextField();
 		idFlied = new JTextField();
 		nameFlied = new JTextField();
@@ -115,8 +118,8 @@ public class InsertAdPane extends JPanel
 		
         gridbag.setConstraints(videpathLabel, cLable);
         adPanel.add(videpathLabel);
-		gridbag.setConstraints(videopathFlied, cText);
-		adPanel.add(videopathFlied);
+		gridbag.setConstraints(updatetimeFlied, cText);
+		adPanel.add(updatetimeFlied);
 		gridbag.setConstraints(videopathButton, cButton);
 		adPanel.add(videopathButton);
 		
@@ -149,8 +152,12 @@ public class InsertAdPane extends JPanel
 		
 		gridbag.setConstraints(infoLabel, cLable);
 		adPanel.add(infoLabel);
-		gridbag.setConstraints(infoFlied, cArea);
-		adPanel.add(infoFlied);
+		
+		infoFlied.setLineWrap(true);
+		JScrollPane infoPane = new JScrollPane(infoFlied);
+		infoPane.setBorder(durationFlied.getBorder());
+		gridbag.setConstraints(infoPane, cArea);
+		adPanel.add(infoPane);
 		
 		
 		JPanel operationPanel = new JPanel();
@@ -186,7 +193,7 @@ public class InsertAdPane extends JPanel
 					String videopath = file.getAbsolutePath();
 					String defaultMetapath = videopath.substring(0, videopath.indexOf("."))+".txt";
 					logger.info("select a video,video path:{} ,defaultMetapath:{}",videopath,defaultMetapath);
-					videopathFlied.setText(videopath);
+					updatetimeFlied.setText(videopath);
 					metapathFlied.setText(defaultMetapath);
 					metapathFlied.setForeground(Color.GRAY);
 					
@@ -223,7 +230,7 @@ public class InsertAdPane extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				videopathFlied.setText("");
+				updatetimeFlied.setText("");
 				metapathFlied.setText("");
 				idFlied.setText("");
 				nameFlied.setText("");
@@ -239,7 +246,7 @@ public class InsertAdPane extends JPanel
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				addButton.setEnabled(false);
+				adFrame.startInfiniteProgress();
 				if(validateFiled())
 				{
 					new Thread()
@@ -247,25 +254,24 @@ public class InsertAdPane extends JPanel
 						public void run()
 						{
 							Ad ad = getAdfromForm();
-							boolean success = adService.insertAd(ad);
+							String videopath = updatetimeFlied.getText().trim();
+							String metafile = metapathFlied.getText().trim();
+							Video video = new Video();
+							video.setId(ad.getId());
+							video.setPath(videopath);
+							video.setMetaPath(metafile);
+							video.setName(ad.getName());
+							boolean success = adUploadService.upload(video, ad);
 							if(success)
 							{
-								//上传指纹到adServer
-								String video = videopathFlied.getText().trim();
-								String metafile = metapathFlied.getText().trim();
-								success = client.upload(video, metafile);
-								//上传失败则回退数据库信息
-								if(!success)
-								{
-									logger.info("upload to ad server unsuccessfully,begin rollbacking the database");
-									adService.deleteAd(ad);
-								}
-								
+								logger.info("add ad successfully");
+								JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("上传广告(%s)成功？", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
 							}else
 							{
-								logger.info("add ad to database unsuccessfully");
+								logger.info("add ad  failed");
+								JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("上传广告(%s)失败？", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
 							}
-							addButton.setEnabled(true);
+							adFrame.stopInfiniteProgress();
 						}
 					}.start();
 					
@@ -281,7 +287,7 @@ public class InsertAdPane extends JPanel
 	
 	private boolean validateFiled()
 	{
-		if(videopathFlied.getText().trim().isEmpty())
+		if(updatetimeFlied.getText().trim().isEmpty())
 		{
 			errorLabel.setText("请选择广告视频文件！");
 			return false;
@@ -327,7 +333,15 @@ public class InsertAdPane extends JPanel
 		ad.setLogo(logoFlied.getText().trim());
 		ad.setDuration(Integer.valueOf(durationFlied.getText().trim()));
 		ad.setInfo(infoFlied.getText().trim());
-		ad.setVideoname(videopathFlied.getText().trim().substring(videopathFlied.getText().trim().lastIndexOf("\\")+1));
+		ad.setUpdatetime(new Date());
 		return ad;
+	}
+
+
+	@Override
+	public void refresh()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

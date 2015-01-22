@@ -19,10 +19,12 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-/** 
-* @author chenyanlin 
-* 
-*/ 
+/**
+ * 
+ * @author liuran
+ * 2015年1月22日
+ *
+ */
 public class ParseDSConfig { 
 /** 
   * 构造函数 
@@ -50,7 +52,7 @@ public Vector<DSConfigBean> readConfigInfo(String path)
    Iterator<Element> allPool=pools.iterator(); 
    while(allPool.hasNext()) 
    { 
-    pool=(Element)allPool.next(); 
+    pool=allPool.next(); 
     DSConfigBean dscBean=new DSConfigBean(); 
     dscBean.setType(pool.getChild("type").getText()); 
     dscBean.setName(pool.getChild("name").getText()); 
@@ -59,7 +61,11 @@ public Vector<DSConfigBean> readConfigInfo(String path)
     dscBean.setUrl(pool.getChild("url").getText()); 
     dscBean.setUsername(pool.getChild("username").getText()); 
     dscBean.setPassword(pool.getChild("password").getText()); 
-    dscBean.setMaxconn(Integer.parseInt(pool.getChild("maxconn").getText())); 
+    dscBean.setMaxconn(Integer.parseInt(pool.getChild("maxconn").getText()));
+    if(dscBean.getType().equals("redis"))
+    {
+    	 dscBean.setHost(pool.getChild("host").getText());
+    }
     dsConfig.add(dscBean); 
    } 
    

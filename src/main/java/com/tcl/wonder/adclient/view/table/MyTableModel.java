@@ -1,4 +1,4 @@
-package com.tcl.wonder.adclient.view.tabpanel;
+package com.tcl.wonder.adclient.view.table;
 
 import java.util.ArrayList;
 import java.util.List;

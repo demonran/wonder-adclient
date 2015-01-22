@@ -1,4 +1,4 @@
-package com.tcl.wonder.adclient.view.jfiled;
+package com.tcl.wonder.adclient.view.component;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -57,7 +57,7 @@ public class AutoCompleteTextFiled extends JTextField
 		cbInput.putClientProperty("is_adjusting", adjusting);
 	}
 
-	public void setupAutoCompleteItem(final List<String> items)
+	public void setupAutoCompleteItem(final Set<String> items)
 	{
 
 		setAdjusting(cbInput, false);
@@ -71,6 +71,7 @@ public class AutoCompleteTextFiled extends JTextField
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
+				System.out.println(e.getSource());
 				if (!isAdjusting(cbInput))
 				{
 					if (cbInput.getSelectedItem() != null)
@@ -102,8 +103,12 @@ public class AutoCompleteTextFiled extends JTextField
 					cbInput.dispatchEvent(e);
 					if (e.getKeyCode() == KeyEvent.VK_ENTER)
 					{
-						setText(cbInput.getSelectedItem().toString());
-						cbInput.setPopupVisible(false);
+						if(cbInput.getSelectedItem() != null)
+						{
+							setText(cbInput.getSelectedItem().toString());
+							cbInput.setPopupVisible(false);
+						}
+						
 					}
 				}
 				if (e.getKeyCode() == KeyEvent.VK_ESCAPE)

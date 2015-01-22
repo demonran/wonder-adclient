@@ -7,10 +7,15 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
+import java.util.Map;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -20,8 +25,11 @@ import org.slf4j.LoggerFactory;
 import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.service.AdService;
 import com.tcl.wonder.adclient.utlis.UIUtils;
+import com.tcl.wonder.adclient.view.AdFrame;
+import com.tcl.wonder.adclient.view.worker.AdSwingWorker;
+import com.tcl.wonder.adclient.view.worker.callback.CallbackAdapter;
 
-public class UpdateAdPane extends JPanel
+public class UpdateAdPane extends TabPanel
 {
 	/**
 	 * 
@@ -31,7 +39,7 @@ public class UpdateAdPane extends JPanel
 	private static Logger logger = LoggerFactory.getLogger(InsertAdPane.class);
 	
 	
-	private JTextField idFlied;
+	private JComboBox<String> idFlied;
 	
 	private JTextField nameFlied;
 	
@@ -41,27 +49,29 @@ public class UpdateAdPane extends JPanel
 	
 	private JTextArea infoFlied;
 	
-	private JTextField videonameFlied;
-	
 	private JButton updateButton;
 	
 	private JButton resetButton;
 	
 	private JLabel errorLabel;
 	
+	private AdFrame adFrame;
+	
+	private Ad ad;
 	
 	private AdService  adService = new AdService();
 	
-	public UpdateAdPane()
+	DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+	
+	public UpdateAdPane(AdFrame adFrame)
 	{
-		logger.debug("add completely");
+		this.adFrame = adFrame;
 		layoutUI();
 	}
 
 
 	private void layoutUI()
 	{
-		
 		JPanel adPanel = new JPanel();
 		
 		GridBagLayout gridbag = new GridBagLayout();
@@ -74,20 +84,18 @@ public class UpdateAdPane extends JPanel
 		JLabel nameLabel = new JLabel("广告名称:");
 		JLabel logoLabel = new JLabel("广告LOGO:");
 		JLabel durationLabel = new JLabel("广告时长:");
-		JLabel videonameLabel = new JLabel("广告视频名称:");
 		JLabel infoLabel = new JLabel("广告信息:");
 		errorLabel = new JLabel();
 		errorLabel.setFont(new Font("Monospaced", Font.ITALIC, 20));
 		errorLabel.setForeground(Color.RED);
 		
-		idFlied = new JTextField();
-		idFlied.setEnabled(false);
+		idFlied = new JComboBox<String>(model);
+		idFlied.setEditable(false);
 		nameFlied = new JTextField();
 		
 		logoFlied = new JTextField();
 		durationFlied = new JTextField();
 		infoFlied = new JTextArea();
-		videonameFlied = new JTextField();
 		
 		updateButton = new JButton("更新");
 		resetButton = new JButton("重置");
@@ -116,15 +124,15 @@ public class UpdateAdPane extends JPanel
 		gridbag.setConstraints(durationFlied, UIUtils.getGridBagConstraints(0, 0, 0));
 		adPanel.add(durationFlied);
 		
-		gridbag.setConstraints(videonameLabel, cLable);
-		adPanel.add(videonameLabel);
-		gridbag.setConstraints(videonameFlied,  UIUtils.getGridBagConstraints(0, 0, 0));
-		adPanel.add(videonameFlied);
-		
 		gridbag.setConstraints(infoLabel, cLable);
 		adPanel.add(infoLabel);
-		gridbag.setConstraints(infoFlied, cArea);
-		adPanel.add(infoFlied);
+		
+		infoFlied.setLineWrap(true);
+		JScrollPane infoPane = new JScrollPane(infoFlied);
+		infoPane.setBorder(durationFlied.getBorder());
+		gridbag.setConstraints(infoPane, cArea);
+		adPanel.add(infoPane);
+
 		
 		
 		JPanel operationPanel = new JPanel();
@@ -137,31 +145,59 @@ public class UpdateAdPane extends JPanel
 		operationPanel.add(updateButton);
 		operationPanel.add(resetButton);
 		
-		logger.debug("add completely");
-		
 		addEvent();
 	}
 	
-	public void update(Ad ad)
+	public void setAd(Ad ad)
 	{
-		idFlied.setText(ad.getId());
+		this.ad = ad;
+		initData();
+	}
+	
+	private void initData()
+	{
+		model.setSelectedItem(ad.getId());
 		nameFlied.setText(ad.getName());
 		logoFlied.setText(ad.getLogo());
 		durationFlied.setText(String.valueOf(ad.getDuration()));
 		infoFlied.setText(ad.getInfo());
-		videonameFlied.setText(ad.getVideoname());
 	}
 
 
 	private void addEvent()
 	{
+		idFlied.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if(idFlied.getSelectedItem() == null)
+				{
+					return;
+				}
+				String id = idFlied.getSelectedItem().toString();
+				logger.info("update ad id :{}" ,id);
+				if(ad == null || !id.equals(ad.getId()))
+				{
+					 new AdSwingWorker(new CallbackAdapter(){
+
+						@Override
+						public void call(Ad ad)
+						{
+							setAd(ad);
+						}
+					},id).execute();;
+				}
+				
+			}
+		});
+		
 		
 		resetButton.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				videonameFlied.setText("");
 				nameFlied.setText("");
 				logoFlied.setText("");
 				durationFlied.setText("");
@@ -183,13 +219,13 @@ public class UpdateAdPane extends JPanel
 						public void run()
 						{
 							Ad ad = getAdfromForm();
-							boolean success = adService.insertAd(ad);
+							boolean success = adService.updateAd(ad);
 							if(success)
 							{
 								logger.info("add ad to database successfully");
 							}else
 							{
-								logger.info("add ad to database unsuccessfully");
+								logger.error("add ad to database failed");
 							}
 							updateButton.setEnabled(true);
 						}
@@ -197,9 +233,6 @@ public class UpdateAdPane extends JPanel
 					
 				}
 					
-					
-				
-				
 			}
 		});
 		
@@ -207,7 +240,7 @@ public class UpdateAdPane extends JPanel
 	
 	private boolean validateFiled()
 	{
-		if(idFlied.getText().trim().isEmpty())
+		if(idFlied.getSelectedItem().toString().isEmpty())
 		{
 			errorLabel.setText("请输入广告ID！");
 			return false;
@@ -232,23 +265,37 @@ public class UpdateAdPane extends JPanel
 			errorLabel.setText("请输入广告详细信息！");
 			return false;
 		}
-		if(videonameFlied.getText().trim().isEmpty())
-		{
-			errorLabel.setText("请输入广告文件名称！");
-			return false;
-		}
 		return true;
 	}
 	
 	private Ad getAdfromForm()
 	{
 		Ad ad = new Ad();
-		ad.setId(idFlied.getText().trim());
+		ad.setId(idFlied.getSelectedItem().toString());
 		ad.setName(nameFlied.getText().trim());
 		ad.setLogo(logoFlied.getText().trim());
 		ad.setDuration(Integer.valueOf(durationFlied.getText().trim()));
 		ad.setInfo(infoFlied.getText().trim());
-		ad.setVideoname(videonameFlied.getText().trim());
+		ad.setUpdatetime(new Date());
 		return ad;
+	}
+
+	@Override
+	public void refresh()
+	{
+		logger.debug(" Updata Panel selected");
+		adFrame.startInfiniteProgress();
+		AdSwingWorker worker = new AdSwingWorker(new CallbackAdapter(){
+			public void call(Map<String,Ad> adsMap)
+			{
+				model.removeAllElements();
+				for(String id : adsMap.keySet())
+				{
+					model.addElement(id);
+				}
+				adFrame.stopInfiniteProgress();
+			}
+		});
+		worker.execute();
 	}
 }

@@ -1,6 +1,5 @@
 package com.tcl.wonder.adclient.dao.connection;
 
-import java.sql.Connection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -38,9 +37,9 @@ public class DBConnectionManager {
 	  * @param name 
 	  * @param con 
 	  */ 
-	public void freeConnection(String name, Connection con) 
+	public void freeConnection(String name, NConnection con) 
 	{ 
-	  DBConnectionPool pool=(DBConnectionPool)pools.get(name);//根据关键名字得到连接池 
+	  DBConnectionPool pool=pools.get(name);//根据关键名字得到连接池 
 	  if(pool!=null) 
 	  pool.freeConnection(con);//释放连接 
 	} 
@@ -49,11 +48,11 @@ public class DBConnectionManager {
 	  * @param name 
 	  * @return 
 	  */ 
-	public Connection getConnection(String name) 
+	public NConnection getConnection(String name) 
 	{ 
 	  DBConnectionPool pool=null; 
-	  Connection con=null; 
-	  pool=(DBConnectionPool)pools.get(name);//从名字中获取连接池 
+	  NConnection con=null; 
+	  pool=pools.get(name);//从名字中获取连接池 
 	  con=pool.getConnection();//从选定的连接池中获得连接 
 	  if(con!=null) 
 	  System.out.println("得到连接。。。"); 
@@ -65,11 +64,11 @@ public class DBConnectionManager {
 	  * @param time 
 	  * @return 
 	  */ 
-	public Connection getConnection(String name, long timeout) 
+	public NConnection getConnection(String name, long timeout) 
 	{ 
 	  DBConnectionPool pool=null; 
-	  Connection con=null; 
-	  pool=(DBConnectionPool)pools.get(name);//从名字中获取连接池 
+	  NConnection con=null; 
+	  pool=pools.get(name);//从名字中获取连接池 
 	  con=pool.getConnection(timeout);//从选定的连接池中获得连接 
 	  System.out.println("得到连接。。。"); 
 	  return con; 
@@ -82,7 +81,7 @@ public class DBConnectionManager {
 	  Enumeration<DBConnectionPool> allpools=pools.elements(); 
 	  while(allpools.hasMoreElements()) 
 	  { 
-	   DBConnectionPool pool=(DBConnectionPool)allpools.nextElement(); 
+	   DBConnectionPool pool=allpools.nextElement(); 
 	   if(pool!=null)pool.release(); 
 	  } 
 	  pools.clear(); 
@@ -100,6 +99,8 @@ public class DBConnectionManager {
 	  dbpool.setUser(dsb.getUsername()); 
 	  dbpool.setPassword(dsb.getPassword()); 
 	  dbpool.setMaxConn(dsb.getMaxconn()); 
+	  dbpool.setType(dsb.getType());
+	  dbpool.setHost(dsb.getHost());
 	  System.out.println("ioio:"+dsb.getMaxconn()); 
 	  pools.put(dsb.getName(), dbpool); 
 	} 
@@ -114,7 +115,7 @@ public class DBConnectionManager {
 	  Iterator<DSConfigBean> alldriver=drivers.iterator(); 
 	  while(alldriver.hasNext()) 
 	  { 
-	   this.createPools((DSConfigBean)alldriver.next()); 
+	   this.createPools(alldriver.next()); 
 	   System.out.println("创建连接池。。。"); 
 	   
 	  } 

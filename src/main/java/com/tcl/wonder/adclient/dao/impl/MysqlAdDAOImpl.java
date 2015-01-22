@@ -1,15 +1,16 @@
 package com.tcl.wonder.adclient.dao.impl;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.tcl.wonder.adclient.dao.AdDAO;
 import com.tcl.wonder.adclient.dao.connection.DBConnectionManager;
+import com.tcl.wonder.adclient.dao.connection.NConnection;
 import com.tcl.wonder.adclient.entity.Ad;
 
 public class MysqlAdDAOImpl implements AdDAO
@@ -24,21 +25,9 @@ public class MysqlAdDAOImpl implements AdDAO
 	
 	private PreparedStatement save;
 	
-	private Connection conn = null;
+	private NConnection conn = null;
 	
 
-	static
-	{
-		try
-		{
-			Class.forName("");
-			
-		} catch (ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
 	public void init()
 	{
 		long time = System.currentTimeMillis();
@@ -96,7 +85,7 @@ public class MysqlAdDAOImpl implements AdDAO
 			save.setString(3, ad.getLogo());
 			save.setString(4, ad.getInfo());
 			save.setInt(5, ad.getDuration());
-			save.setString(6, ad.getVideoname());
+			save.setString(6, String.valueOf(ad.getUpdatetime().getTime()));
 			save.executeUpdate();
 		} catch (SQLException e)
 		{
@@ -124,6 +113,27 @@ public class MysqlAdDAOImpl implements AdDAO
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Map<String, Ad> findAlltoMap()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean addAll(List<Ad> ad)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean delete(String id)
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	
