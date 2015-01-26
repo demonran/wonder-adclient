@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.tcl.wonder</groupId>
 	<artifactId>adclient</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>adclient Maven Webapp</name>
 	<url>http://maven.apache.org</url>
@@ -131,6 +131,54 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<finalName>adclient</finalName>
+		<finalName>AExpert</finalName>
+		<plugins>
+		 <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-compiler-plugin</artifactId>  
+                <version>3.1</version>
+                <configuration>  
+                    <defaultLibBundleDir>lib</defaultLibBundleDir>  
+                    <source>1.7</source>  
+                    <target>1.7</target>  
+                    <encoding>GBK</encoding>  
+                </configuration>  
+            </plugin>  
+            
+		<plugin>  
+    		<groupId>org.apache.maven.plugins</groupId>  
+    		<artifactId>maven-jar-plugin</artifactId>  
+    		<version>2.4</version>  
+    		<configuration>  
+        		<archive>  
+           		 	<manifest>  
+                		<addClasspath>true</addClasspath>  
+                		<classpathPrefix>lib/</classpathPrefix>  
+                		<mainClass>com.tcl.wonder.adclient.view.AdFrame</mainClass>  
+            		</manifest>  
+        		</archive>  
+    		</configuration>  
+		</plugin>  
+		 <!-- 拷贝依赖的jar包到lib目录 -->  
+            <plugin>  
+                <groupId>org.apache.maven.plugins</groupId>  
+                <artifactId>maven-dependency-plugin</artifactId>  
+                <executions>  
+                    <execution>  
+                        <id>copy</id>  
+                        <phase>package</phase>  
+                        <goals>  
+                            <goal>copy-dependencies</goal>  
+                        </goals>  
+                        <configuration>  
+                            <outputDirectory>  
+                                ${project.build.directory}/lib  
+                            </outputDirectory>  
+                        </configuration>  
+                    </execution>  
+                </executions>  
+            </plugin>  
+		</plugins>
 	</build>
+	
 </project>

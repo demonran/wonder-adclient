@@ -4,10 +4,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
-/** 
-* @author chenyanlin 
-* 
-*/ 
+/**
+ * @author liuran
+ * 2015年1月22日
+ *
+ */
 public class DBConnectionManager { 
 	static private DBConnectionManager instance;//唯一数据库连接池管理实例类 
 	private Vector<DSConfigBean> drivers  = new Vector<DSConfigBean>();//驱动信息 
@@ -129,7 +130,7 @@ public class DBConnectionManager {
 	{ 
 	  ParseDSConfig pd=new ParseDSConfig(); 
 	//读取数据库配置文件 
-	  drivers=pd.readConfigInfo("ds-config.xml"); 
+	  drivers=pd.readConfigInfo("conf/ds-config.xml"); 
 	  System.out.println("加载驱动程序。。。"); 
 	} 
 }

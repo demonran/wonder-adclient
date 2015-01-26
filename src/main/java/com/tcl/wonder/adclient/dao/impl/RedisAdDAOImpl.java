@@ -48,7 +48,8 @@ public class RedisAdDAOImpl implements AdDAO
 		hash.put("logo", ad.getLogo());
 		hash.put("info", ad.getInfo());
 		hash.put("duration", String.valueOf(ad.getDuration()));
-		hash.put("updatetime", String.valueOf(ad.getUpdatetime().getTime()));
+		long updateTime = ad.getUpdatetime()==null?System.currentTimeMillis():ad.getUpdatetime().getTime();
+		hash.put("updatetime", String.valueOf(updateTime));
 		sharedJedis.hmset(AD_PREFIX+ad.getId(), hash);
 		WonderCache.setDatabaseHasUpdate(true);
 		return true;
@@ -122,7 +123,11 @@ public class RedisAdDAOImpl implements AdDAO
 	@Override
 	public Ad findById(String id)
 	{
-		Map<String,String> adMap = sharedJedis.hgetAll(id);
+		Map<String,String> adMap = sharedJedis.hgetAll(AD_PREFIX+id);
+		if(adMap == null || adMap.size() == 0)
+		{
+			return null;
+		}
 		return new Ad(adMap);
 	}
 

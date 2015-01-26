@@ -10,6 +10,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * 公共工具类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class Utilities
 {
 	private static SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:MM:ss");

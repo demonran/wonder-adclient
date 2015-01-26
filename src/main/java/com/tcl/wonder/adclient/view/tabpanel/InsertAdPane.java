@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.entity.Video;
-import com.tcl.wonder.adclient.service.AdUploadService;
+import com.tcl.wonder.adclient.service.AdWonderService;
 import com.tcl.wonder.adclient.utlis.UIUtils;
 import com.tcl.wonder.adclient.view.AdFrame;
 /**
@@ -68,7 +68,7 @@ public class InsertAdPane extends TabPanel
 	
 	private JLabel errorLabel;
 	
-	private AdUploadService adUploadService = AdUploadService.getInstance();
+	private AdWonderService adUploadService = AdWonderService.getInstance();
 	
 	private AdFrame adFrame;
 	
@@ -254,22 +254,31 @@ public class InsertAdPane extends TabPanel
 						public void run()
 						{
 							Ad ad = getAdfromForm();
-							String videopath = updatetimeFlied.getText().trim();
-							String metafile = metapathFlied.getText().trim();
-							Video video = new Video();
-							video.setId(ad.getId());
-							video.setPath(videopath);
-							video.setMetaPath(metafile);
-							video.setName(ad.getName());
-							boolean success = adUploadService.upload(video, ad);
-							if(success)
+							
+							if(adUploadService.isAdExist(ad))
 							{
-								logger.info("add ad successfully");
-								JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("上传广告(%s)成功？", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
+								logger.info("Ad {} already exist",ad.getId());
+								JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("广告(%s)已经存在!", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
+								
 							}else
 							{
-								logger.info("add ad  failed");
-								JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("上传广告(%s)失败？", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
+								String videopath = updatetimeFlied.getText().trim();
+								String metafile = metapathFlied.getText().trim();
+								Video video = new Video();
+								video.setId(ad.getId());
+								video.setPath(videopath);
+								video.setMetaPath(metafile);
+								video.setName(ad.getName());
+								boolean success = adUploadService.upload(video, ad);
+								if(success)
+								{
+									logger.info("add ad successfully");
+									JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("上传广告(%s)成功!", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
+								}else
+								{
+									logger.info("add ad  failed");
+									JOptionPane.showMessageDialog(adFrame, UIUtils.convertHtml(String.format("上传广告(%s)失败!", ad.getName())),"上传广告",JOptionPane.YES_OPTION);
+								}
 							}
 							adFrame.stopInfiniteProgress();
 						}

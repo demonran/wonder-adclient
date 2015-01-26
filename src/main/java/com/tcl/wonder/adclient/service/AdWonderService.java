@@ -8,32 +8,58 @@ import java.io.PrintWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.tcl.wonder.adclient.config.Config;
+import com.tcl.wonder.adclient.config.ConfigManager;
 import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.entity.Video;
 import com.tcl.wonder.adclient.utlis.HttpUtils;
 import com.tcl.wonder.adclient.utlis.Utilities;
 
 
-
-public class AdUploadService
+/**
+ * AD服务类，实现事务性上传删除。
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
+public class AdWonderService
 {
-	String ipPort="localhost:8080";
-	String urlPath = "http://" + ipPort + "/WonderAdMatchingServer/api/";
 	
-	private static Logger logger = LoggerFactory.getLogger(AdUploadService.class);
 	
-	private static  AdUploadService instance;
+	private static Logger logger = LoggerFactory.getLogger(AdWonderService.class);
 	
-	private AdService adService = AdService.getInstance();
+	private static  AdWonderService instance;
 	
-	public static AdUploadService getInstance()
+	private AdService adService;
+	
+	String urlPath ;
+	
+	public AdWonderService()
 	{
-		if(instance == null)
-		{
-			logger.info("AdUploadService initialized...");
-			instance = new AdUploadService();
+		urlPath = Config.getString("adServerApi");
+		adService = AdService.getInstance();
+	}
+	
+	public static AdWonderService getInstance()
+	{
+		if(instance == null){
+			synchronized (ConfigManager.class) {
+				logger.info("AdUploadService initialized...");
+				instance = new AdWonderService();
+			}
 		}
 		return instance;
+	}
+	
+	public boolean isAdExist(Ad ad)
+	{
+		return isAdExitst(ad.getId());
+	}
+	
+	public boolean isAdExitst(String adId)
+	{
+		return adService.getAdByAdId(adId)!= null;
+		
 	}
 	
 	public synchronized boolean upload(Video video,Ad ad)
@@ -45,7 +71,8 @@ public class AdUploadService
 			//上传指纹到adServer
 			String videopath = video.getPath();
 			File videoFile = new File(videopath);
-			String adsName =  new File(videopath).getName();
+			String filename =  new File(videopath).getName();
+			String adsName =filename.substring(0, filename.indexOf("."));
 			String meta = adsName+".txt";
 		
 			File metafile = new File(videoFile.getParent() +"/"+meta);
@@ -129,6 +156,17 @@ public class AdUploadService
 //		     }
 //		          }
 //		        }
+
+	public boolean delete(Ad ad)
+	{
+		boolean success = adService.deleteAd(ad);
+		if(success)
+		{
+			//do someting to delete the ad wonder server
+		}
+		return success;
+		
+	}
 
 		        
 		      

@@ -7,7 +7,7 @@ import javax.swing.SwingWorker;
 import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.entity.Video;
 import com.tcl.wonder.adclient.entity.Video.Status;
-import com.tcl.wonder.adclient.service.AdUploadService;
+import com.tcl.wonder.adclient.service.AdWonderService;
 import com.tcl.wonder.adclient.view.worker.callback.Callback;
 
 public class UploadSwingWorker extends SwingWorker<Boolean, Integer>
@@ -18,7 +18,7 @@ public class UploadSwingWorker extends SwingWorker<Boolean, Integer>
 	
 	private Callback callback;
 	
-	private AdUploadService service = AdUploadService.getInstance();
+	private AdWonderService service = AdWonderService.getInstance();
 	
 	
 
@@ -54,7 +54,7 @@ public class UploadSwingWorker extends SwingWorker<Boolean, Integer>
 			
 			callback.call(video);
 			
-		} catch (InterruptedException | ExecutionException e)
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}

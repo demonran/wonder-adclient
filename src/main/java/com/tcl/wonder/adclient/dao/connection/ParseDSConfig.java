@@ -39,10 +39,12 @@ public ParseDSConfig() {
   */ 
 public Vector<DSConfigBean> readConfigInfo(String path) 
 { 
-   InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
+   
   Vector<DSConfigBean> dsConfig=null; 
+  InputStream is = null;
   try 
   { 
+	is = new FileInputStream(path);
    dsConfig=new Vector<DSConfigBean>(); 
    SAXBuilder sb=new SAXBuilder(); 
    Document doc=sb.build(is); 
@@ -96,6 +98,43 @@ public void modifyConfigInfo(String path,DSConfigBean dsb) throws Exception
   String rpath=this.getClass().getResource("").getPath().substring(1)+path; 
   FileInputStream fi=null; //读出 
   FileOutputStream fo=null; //写入 
+  
+  try 
+  { 
+   fi=new FileInputStream(rpath);//读取路径文件 
+   SAXBuilder sb=new SAXBuilder(); 
+   Document doc=sb.build(fi); 
+   Element root=doc.getRootElement(); 
+   List<Element> pools=root.getChildren(); 
+   Element pool=null; 
+   Iterator<Element> allPool=pools.iterator(); 
+   while(allPool.hasNext()) 
+   { 
+    pool=allPool.next(); 
+    if(pool.getChild("name").getText().equals(dsb.getName())) 
+    { 
+    	pool.getChild("type").setText(dsb.getType());
+    	pool.getChild("name").setText(dsb.getName());
+    	pool.getChild("driver").setText(dsb.getDriver());
+    	pool.getChild("url").setText(dsb.getUrl());
+    	pool.getChild("username").setText(dsb.getUsername());
+    	pool.getChild("password").setText(dsb.getPassword());
+    	pool.getChild("maxconn").setText(String.valueOf(dsb.getMaxconn()));
+    	break; 
+    } 
+   } 
+   Format format = Format.getPrettyFormat(); 
+      format.setIndent(""); 
+      format.setEncoding("utf-8"); 
+      XMLOutputter outp = new XMLOutputter(format); 
+      fo = new FileOutputStream(rpath); 
+      outp.output(doc, fo); 
+   
+  }catch (JDOMException e) { 
+   e.printStackTrace(); 
+  } catch (IOException e) { 
+   e.printStackTrace(); 
+  } 
   
 } 
 /** 
@@ -182,12 +221,12 @@ public void delConfigInfo(String path,String name)
    SAXBuilder sb=new SAXBuilder(); 
    Document doc=sb.build(fi); 
    Element root=doc.getRootElement(); 
-   List pools=root.getChildren(); 
+   List<Element> pools=root.getChildren(); 
    Element pool=null; 
-   Iterator allPool=pools.iterator(); 
+   Iterator<Element> allPool=pools.iterator(); 
    while(allPool.hasNext()) 
    { 
-    pool=(Element)allPool.next(); 
+    pool=allPool.next(); 
     if(pool.getChild("name").getText().equals(name)) 
     { 
      pools.remove(pool); 
@@ -201,14 +240,9 @@ public void delConfigInfo(String path,String name)
       fo = new FileOutputStream(rpath); 
       outp.output(doc, fo); 
    
-  } catch (FileNotFoundException e) { 
-   // TODO Auto-generated catch block 
-   e.printStackTrace(); 
-  } catch (JDOMException e) { 
-   // TODO Auto-generated catch block 
+  }catch (JDOMException e) { 
    e.printStackTrace(); 
   } catch (IOException e) { 
-   // TODO Auto-generated catch block 
    e.printStackTrace(); 
   } 
   
@@ -217,7 +251,6 @@ public void delConfigInfo(String path,String name)
    try { 
     fi.close(); 
    } catch (IOException e) { 
-    // TODO Auto-generated catch block 
     e.printStackTrace(); 
    } 
   } 

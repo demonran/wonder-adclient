@@ -7,6 +7,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Date;
 import java.util.Map;
 
@@ -26,9 +28,16 @@ import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.service.AdService;
 import com.tcl.wonder.adclient.utlis.UIUtils;
 import com.tcl.wonder.adclient.view.AdFrame;
+import com.tcl.wonder.adclient.view.Contents;
 import com.tcl.wonder.adclient.view.worker.AdSwingWorker;
 import com.tcl.wonder.adclient.view.worker.callback.CallbackAdapter;
 
+/**
+ * 广告信息更新类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class UpdateAdPane extends TabPanel
 {
 	/**
@@ -37,7 +46,6 @@ public class UpdateAdPane extends TabPanel
 	private static final long serialVersionUID = 1L;
 	
 	private static Logger logger = LoggerFactory.getLogger(InsertAdPane.class);
-	
 	
 	private JComboBox<String> idFlied;
 	
@@ -151,12 +159,10 @@ public class UpdateAdPane extends TabPanel
 	public void setAd(Ad ad)
 	{
 		this.ad = ad;
-		initData();
 	}
 	
 	private void initData()
 	{
-		model.setSelectedItem(ad.getId());
 		nameFlied.setText(ad.getName());
 		logoFlied.setText(ad.getLogo());
 		durationFlied.setText(String.valueOf(ad.getDuration()));
@@ -166,18 +172,26 @@ public class UpdateAdPane extends TabPanel
 
 	private void addEvent()
 	{
-		idFlied.addActionListener(new ActionListener()
+		idFlied.addItemListener(new ItemListener()
 		{
+			
 			@Override
-			public void actionPerformed(ActionEvent e)
+			public void itemStateChanged(ItemEvent e)
 			{
-				if(idFlied.getSelectedItem() == null)
+				if(e.getItem() == null)
 				{
 					return;
 				}
-				String id = idFlied.getSelectedItem().toString();
+				String id = e.getItem().toString();
 				logger.info("update ad id :{}" ,id);
-				if(ad == null || !id.equals(ad.getId()))
+				if(id.equals(Contents.ID_SELECT))
+				{
+					nameFlied.setText("");
+					logoFlied.setText("");
+					durationFlied.setText("");
+					infoFlied.setText("");
+				}
+				else
 				{
 					 new AdSwingWorker(new CallbackAdapter(){
 
@@ -185,9 +199,19 @@ public class UpdateAdPane extends TabPanel
 						public void call(Ad ad)
 						{
 							setAd(ad);
+							initData();
 						}
 					},id).execute();;
 				}
+				
+				
+			}
+		});
+		idFlied.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
 				
 			}
 		});
@@ -289,6 +313,7 @@ public class UpdateAdPane extends TabPanel
 			public void call(Map<String,Ad> adsMap)
 			{
 				model.removeAllElements();
+				model.addElement(ad==null? Contents.ID_SELECT : ad.getId());
 				for(String id : adsMap.keySet())
 				{
 					model.addElement(id);

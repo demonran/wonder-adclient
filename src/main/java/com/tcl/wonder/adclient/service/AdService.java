@@ -11,6 +11,12 @@ import com.tcl.wonder.adclient.dao.ChannelAdDAO;
 import com.tcl.wonder.adclient.dao.impl.DAOFactory;
 import com.tcl.wonder.adclient.entity.Ad;
 
+/**
+ * AD数据库操作封装服务类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class AdService
 {
 	private AdDAO adDAO = DAOFactory.getLocalAdDAO();

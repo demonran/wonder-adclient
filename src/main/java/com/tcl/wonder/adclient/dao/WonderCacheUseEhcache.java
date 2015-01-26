@@ -21,7 +21,7 @@ public class WonderCacheUseEhcache
 	private Cache cache;
 	
 	public WonderCacheUseEhcache(){
-		CacheManager manager = CacheManager.create();
+		CacheManager manager = CacheManager.create("conf/ehcache.xml");
 		cache = manager.getCache("wonderCache");
 		
 	}

@@ -1,5 +1,11 @@
 package com.tcl.wonder.adclient.entity;
 
+/**
+ * Video实体类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class Video
 {
 	

@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 import com.tcl.wonder.adclient.entity.Video.Status;
 import com.tcl.wonder.adclient.utlis.UIUtils;
 
+/**
+ * 视频状态渲染类，实现不同状态下显示
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class StatusCellRenderer extends DefaultTableCellRenderer 
 {
 	/**

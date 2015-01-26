@@ -47,8 +47,7 @@ public class AdFrame extends JFrame
 		try
 		{
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e)
+		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}

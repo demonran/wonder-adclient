@@ -7,6 +7,12 @@ import java.awt.Toolkit;
 
 import javax.swing.ImageIcon;
 
+/**
+ * UI工具类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class UIUtils
 {
 	

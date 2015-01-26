@@ -14,6 +14,12 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 
+/**
+ * HTTP请求工具类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class HttpUtils
 {
 
@@ -124,7 +130,7 @@ public class HttpUtils
 	        }
 	        
 	      
-	        private static void deleteRequest(String videoFile)
+	        public static void deleteRequest(String videoFile)
 	          throws IOException
 	        {
 	     URL url = new URL(urlString + "match/delete");
@@ -151,7 +157,7 @@ public class HttpUtils
 	        }
 	        
 	        
-	        private static void searchID(String keyword) throws IOException {
+	        public static void searchID(String keyword) throws IOException {
 	     URL url = new URL(urlString + "match/search");
 	     HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 	     InputStream inStream = null;
@@ -188,7 +194,7 @@ public class HttpUtils
 	          }
 	        }
 	        
-	        private static void listDetail(String id)
+	        public static void listDetail(String id)
 	          throws IOException
 	        {
 	       URL url = new URL(urlString + "match/list");

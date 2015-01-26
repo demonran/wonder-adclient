@@ -14,7 +14,12 @@ import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
 
 import com.tcl.wonder.adclient.utlis.Utilities;
-
+/**
+ * 
+ * @author liuran
+ * 2015年1月22日
+ *
+ */
 public class DBConnectionPool
 {
 	private Connection con = null;
@@ -69,6 +74,7 @@ public class DBConnectionPool
 	{
 		this.freeConnections.add(con);// 添加到空闲连接的末尾
 		this.inUsed--;
+		System.out.println("释放　" + this.name + "　的连接，现有" + inUsed + "个连接在使用!");
 	}
 
 	/**

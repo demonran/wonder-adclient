@@ -14,6 +14,12 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+/**
+ * 自动提示输入框
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class AutoCompleteTextFiled extends JTextField
 {
 	/**

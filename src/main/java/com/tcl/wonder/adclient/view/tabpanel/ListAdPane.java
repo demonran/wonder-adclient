@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.tcl.wonder.adclient.entity.Ad;
-import com.tcl.wonder.adclient.service.AdService;
+import com.tcl.wonder.adclient.service.AdWonderService;
 import com.tcl.wonder.adclient.utlis.UIUtils;
 import com.tcl.wonder.adclient.utlis.Utilities;
 import com.tcl.wonder.adclient.view.AdFrame;
@@ -39,7 +39,12 @@ import com.tcl.wonder.adclient.view.component.AutoCompleteTextFiled;
 import com.tcl.wonder.adclient.view.table.MyTableModel;
 import com.tcl.wonder.adclient.view.worker.AdSwingWorker;
 import com.tcl.wonder.adclient.view.worker.callback.CallbackAdapter;
-
+/**
+ * AD列表类，用于显示所有广告信息
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class ListAdPane extends TabPanel
 {
 
@@ -71,7 +76,7 @@ public class ListAdPane extends TabPanel
 
 	Map<String, Ad> allAdsMap ;
 	
-	private AdService adServer = AdService.getInstance();
+	private AdWonderService adWonderService = AdWonderService.getInstance();
 	
 	public ListAdPane(AdFrame adFrame)
 	{
@@ -222,10 +227,13 @@ public class ListAdPane extends TabPanel
 				if (option == JOptionPane.OK_OPTION)
 				{
 					String id = (String)table.getValueAt(selectedRow, 1);
-					adServer.deleteAdById(id);
-					allAdsMap.remove(id);
-					tableModel.remove(selectedRow);
-					
+					Ad ad = getAdByTablerow(selectedRow);
+					boolean success = adWonderService.delete(ad);
+					if(success)
+					{
+						allAdsMap.remove(id);
+						tableModel.remove(selectedRow);
+					}
 				}
 
 			}
@@ -382,7 +390,7 @@ public class ListAdPane extends TabPanel
 		}
 		String name = (String) table.getValueAt(selectedRow, 2);
 		String logo = (String) table.getValueAt(selectedRow, 3);
-		int duration = (int) table.getValueAt(selectedRow, 4);
+		int duration = (Integer) table.getValueAt(selectedRow, 4);
 		String info = (String) table.getValueAt(selectedRow, 5);
 		Date updatetime = Utilities.parse((String) table.getValueAt(selectedRow, 6));
 
@@ -393,7 +401,7 @@ public class ListAdPane extends TabPanel
 	@Override
 	public void refresh()
 	{
-//		initData();
+		initData();
 	}
 
 }

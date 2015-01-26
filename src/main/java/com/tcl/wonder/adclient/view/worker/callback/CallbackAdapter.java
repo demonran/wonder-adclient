@@ -5,6 +5,12 @@ import java.util.Map;
 import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.entity.Video;
 
+/**
+ * 回调适配器
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class CallbackAdapter implements Callback
 {
 

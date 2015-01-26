@@ -8,6 +8,12 @@ import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.service.AdService;
 import com.tcl.wonder.adclient.view.worker.callback.Callback;
 
+/**
+ * 异步处理类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class AdSwingWorker extends SwingWorker<Map<String,Ad>, Void>
 {
 	private AdService adServer = AdService.getInstance();

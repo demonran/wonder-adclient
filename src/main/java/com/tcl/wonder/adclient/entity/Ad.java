@@ -4,6 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * AD实体类
+ * @author liuran
+ * 2015年1月23日
+ *
+ */
 public class Ad implements Serializable
 {
 	/**
