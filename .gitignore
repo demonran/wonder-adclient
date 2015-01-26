@@ -12,3 +12,4 @@ rstudio.iml
 *.iml
 
 /.classpath
+/log
