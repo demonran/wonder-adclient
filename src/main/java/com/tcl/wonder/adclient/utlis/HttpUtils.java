@@ -3,6 +3,7 @@ package com.tcl.wonder.adclient.utlis;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,7 +65,40 @@ public class HttpUtils
 	        }
 	        
 	      
-	      
+//	    public static File getFile(String urlString) throws IOException
+//	      {
+//	      URL url = new URL(urlString);
+//	      HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+//	      InputStream inStream = null;
+//	      OutputStream out = null;
+//	     String result = null;
+//	          
+//	     conn.setDoOutput(true);
+//	     conn.setDoInput(true);
+//	     conn.setRequestMethod("GET");
+//	     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+//	     conn.setRequestProperty("charset", "utf-8");
+//	     conn.setUseCaches(false);
+//	          
+//	      
+//	     int responseCode = conn.getResponseCode();
+//	     if (responseCode == 200) {
+//	       inStream = conn.getInputStream();
+//	       out = new FileOutputStream();
+//	            
+//	       int len = -1;
+//	       byte[] buffer = new byte['?'];
+//	       while ((len = inStream.read(buffer)) != -1) {
+//	         out.write(buffer, 0, len);
+//	            }
+//	            
+//	       out.flush();
+//	       result = out.toString();
+//	       
+//	          }
+//	     return result;
+//	        }
+	        
 	        
 	      
     public static boolean postFile(String urlPath,String videoFile, String metaFile)throws IOException

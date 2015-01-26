@@ -27,8 +27,10 @@ import org.slf4j.LoggerFactory;
 import com.tcl.wonder.adclient.entity.Ad;
 import com.tcl.wonder.adclient.service.AdService;
 import com.tcl.wonder.adclient.utlis.UIUtils;
+import com.tcl.wonder.adclient.utlis.Utilities;
 import com.tcl.wonder.adclient.view.AdFrame;
 import com.tcl.wonder.adclient.view.Contents;
+import com.tcl.wonder.adclient.view.component.ImageDialog;
 import com.tcl.wonder.adclient.view.worker.AdSwingWorker;
 import com.tcl.wonder.adclient.view.worker.callback.CallbackAdapter;
 
@@ -63,6 +65,8 @@ public class UpdateAdPane extends TabPanel
 	
 	private JLabel errorLabel;
 	
+	private ImageDialog imageDialog ;
+	
 	private AdFrame adFrame;
 	
 	private Ad ad;
@@ -70,6 +74,8 @@ public class UpdateAdPane extends TabPanel
 	private AdService  adService = new AdService();
 	
 	DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+
+	private JButton lookButton;
 	
 	public UpdateAdPane(AdFrame adFrame)
 	{
@@ -102,6 +108,9 @@ public class UpdateAdPane extends TabPanel
 		nameFlied = new JTextField();
 		
 		logoFlied = new JTextField();
+		lookButton = new JButton("‘§¿¿");
+		lookButton.setIcon(UIUtils.getImageIcon("search.gif"));
+		lookButton.setContentAreaFilled(false);
 		durationFlied = new JTextField();
 		infoFlied = new JTextArea();
 		
@@ -113,9 +122,9 @@ public class UpdateAdPane extends TabPanel
 		adPanel.add(idLabel);
 		gridbag.setConstraints(idFlied,cText);
 		adPanel.add(idFlied);
-		JLabel label = new JLabel();
-		gridbag.setConstraints(label, UIUtils.getGridBagConstraints(0, 1, 0));
-		adPanel.add(label);
+		JLabel label1 = new JLabel();
+		gridbag.setConstraints(label1, UIUtils.getGridBagConstraints(0, 1, 0));
+		adPanel.add(label1);
 		
 		gridbag.setConstraints(nameLabel, cLable);
 		adPanel.add(nameLabel);
@@ -124,8 +133,13 @@ public class UpdateAdPane extends TabPanel
 		
 		gridbag.setConstraints(logoLabel, cLable);
 		adPanel.add(logoLabel);
-		gridbag.setConstraints(logoFlied, UIUtils.getGridBagConstraints(0, 0, 0));
+		gridbag.setConstraints(logoFlied, UIUtils.getGridBagConstraints(1, 0, 0));
 		adPanel.add(logoFlied);
+		gridbag.setConstraints(lookButton, UIUtils.getGridBagConstraints(1, 0.1, 0));
+		adPanel.add(lookButton);
+		JLabel label2 = new JLabel();
+		gridbag.setConstraints(label2, UIUtils.getGridBagConstraints(0, 1, 0));
+		adPanel.add(label2);
 		
 		gridbag.setConstraints(durationLabel, cLable);
 		adPanel.add(durationLabel);
@@ -152,6 +166,8 @@ public class UpdateAdPane extends TabPanel
 		this.add(operationPanel,BorderLayout.SOUTH);
 		operationPanel.add(updateButton);
 		operationPanel.add(resetButton);
+		
+		imageDialog = new ImageDialog(adFrame);
 		
 		addEvent();
 	}
@@ -257,6 +273,25 @@ public class UpdateAdPane extends TabPanel
 					
 				}
 					
+			}
+		});
+		
+		lookButton.addActionListener(new ActionListener()
+		{
+			
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				String logFilename = logoFlied.getText();
+				if(!Utilities.isStringEmpty(logFilename))
+				{
+					imageDialog.setImageUrl(Contents.AD_LOGO_PROFIX+logFilename);
+					imageDialog.showImage(true);
+					
+//					JDialog dialog = new JDialog(adFrame,true);
+//					dialog.setVisible(true);
+				}
+				
 			}
 		});
 		

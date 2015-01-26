@@ -165,7 +165,7 @@ public class BatchInsertPane extends TabPanel
 		list.add(new Video("11", "11", "111", Status.STARTED));
 		list.add(new Video("11", "11", "111", Status.SUCCESS));
 		list.add(new Video("11", "11", "111", Status.FAILED));
-		updateTable(list);
+//		updateTable(list);
 
 	}
 

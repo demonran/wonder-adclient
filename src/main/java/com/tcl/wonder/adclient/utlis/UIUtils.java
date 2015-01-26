@@ -1,9 +1,12 @@
 package com.tcl.wonder.adclient.utlis;
 
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.net.URL;
 
 import javax.swing.ImageIcon;
 
@@ -89,6 +92,11 @@ public class UIUtils
 		return imageIcon;
 	}
 	
+	public static ImageIcon getImageIcon(URL url){
+		ImageIcon imageIcon = new ImageIcon(url);
+		return imageIcon;
+	}
+	
 	/**
 	 * 
 	 * @param imageName
@@ -110,6 +118,35 @@ public class UIUtils
 	
 	/**
 	 * 
+	 * @param imageName
+	 * @return
+	 */
+	public static ImageIcon getImageIcon(URL url,int x,int y){
+		ImageIcon imageIcon=getImageIcon(url);
+		int width=imageIcon.getIconWidth();
+		int height=imageIcon.getIconHeight();
+		float xbili=(float) ((x*1.0)/width);
+		float ybili=(float) ((y*1.0)/height);
+		float bili=xbili>ybili?ybili:xbili;
+		int newwidth=(int) (width*bili);
+		int newheight=(int) (height*bili);
+		Image image=getImage(imageIcon.getImage(),newwidth,newheight);
+		imageIcon.setImage(image);
+		return imageIcon;
+	}
+	
+	/**
+	 * 
+	 * @param imageName 
+	 * @return
+	 */
+	public static Image getImage(Image image,int x,int y){
+		image = image.getScaledInstance(x,y, Image.SCALE_SMOOTH); 
+		return image;
+	}
+	
+	/**
+	 * 
 	 * @param imageName 
 	 * @return
 	 */
@@ -117,6 +154,24 @@ public class UIUtils
 		Image image = Toolkit.getDefaultToolkit().getImage("icon/"+imageName);
 		image = image.getScaledInstance(x,y, Image.SCALE_SMOOTH); 
 		return image;
+	}
+	
+	public static void centerWindow(Container window) {
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		int w = window.getSize().width;
+		int h = window.getSize().height;
+		int x = (dim.width - w) / 2;
+		int y = (dim.height - h) / 2;
+		window.setLocation(x, y);
+	}
+	
+	public static void centerFrame(Container window,Container parent) {
+		Dimension dim = parent.getSize();
+		int w = window.getSize().width;
+		int h = window.getSize().height;
+		int x = (dim.width - w) / 2;
+		int y = (dim.height - h) / 2;
+		window.setLocation(x, y);
 	}
 	
 

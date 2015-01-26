@@ -11,10 +11,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +134,7 @@ public class AdFrame extends JFrame
 
 	public static void main(String[] args)
 	{
+		PropertyConfigurator.configure("conf/log4j.properties");
 		AdFrame f = new AdFrame();
 		f.setTitle("Wonder Advertisement Client");
 		f.setVisible(true);
