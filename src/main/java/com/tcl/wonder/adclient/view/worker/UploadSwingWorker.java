@@ -1,7 +1,5 @@
 package com.tcl.wonder.adclient.view.worker;
 
-import java.util.concurrent.ExecutionException;
-
 import javax.swing.SwingWorker;
 
 import com.tcl.wonder.adclient.entity.Ad;
