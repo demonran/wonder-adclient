@@ -21,6 +21,12 @@ import org.slf4j.LoggerFactory;
 
 import com.tcl.wonder.adclient.utlis.UIUtils;
 
+/**
+ * 图片dialog类，用于异步图片显示
+ * @author liuran
+ * 2015年1月27日
+ *
+ */
 public class ImageDialog extends JDialog
 {
 	/**
@@ -36,14 +42,10 @@ public class ImageDialog extends JDialog
 	
 	private JPanel imagePane;
 	
-	private Frame parentFrame;
-	
 
 	public ImageDialog(Frame frame)
 	{
 		super(frame,true);
-		this.parentFrame = frame;
-		
 		updateUI(frame);
 	}
 	
@@ -117,17 +119,6 @@ public class ImageDialog extends JDialog
 	{
 		refreshImage(UIUtils.getImageIcon("started1.gif"));
 		
-		
-		
-		
-//		imageLabel.setIcon(UIUtils.getImageIcon("started1.gif"));
-//		imageLabel.setSize(new Dimension(icon.getIconWidth(),icon.getIconHeight()));
-//		setPreferredSize(new Dimension(300,300));
-//		imageLabel.setIcon(UIUtils.getImageIcon("failed.jpg"));
-//		repaint();
-		
-		
-			
 		new SwingWorker<ImageIcon, Void>()
 		{
 			@Override
@@ -170,8 +161,6 @@ public class ImageDialog extends JDialog
 		}.execute();
 		
 		this.setVisible(true);
-//		ImageIcon icon = UIUtils.getImageIcon(imageUrl,100,100);
-//		imageLabel.setIcon(icon);
 		
 	}
 	

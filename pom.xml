@@ -15,42 +15,6 @@
 	</properties>
 
 	<dependencies>
-
-		<!-- security dependencies -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-config</artifactId>
-			<version>${spring.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-taglibs</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-
-		<!-- other spring dependencies to resolve conflict -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-expression</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-
 		<!-- web dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -112,16 +76,6 @@
 			<version>4.2.6</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>${codehaus.jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-core-asl</artifactId>
-			<version>${codehaus.jackson.version}</version>
-		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -156,7 +110,10 @@
                 		<classpathPrefix>lib/</classpathPrefix>  
                 		<mainClass>com.tcl.wonder.adclient.view.AdFrame</mainClass>  
             		</manifest>  
-        		</archive>  
+        		</archive> 
+        		<outputDirectory>
+        			${project.build.directory}/AExpert/lib  
+        		</outputDirectory> 
     		</configuration>  
 		</plugin>  
 		 <!-- 拷贝依赖的jar包到lib目录 -->  
@@ -172,12 +129,61 @@
                         </goals>  
                         <configuration>  
                             <outputDirectory>  
-                                ${project.build.directory}/lib  
+                                ${project.build.directory}/AExpert/lib  
                             </outputDirectory>  
                         </configuration>  
                     </execution>  
                 </executions>  
             </plugin>  
+            <plugin>
+            	<artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+ 				<executions>
+ 					 <execution>  
+                        <id>copy-resources</id>  
+                        <phase>package</phase>  
+                        <goals>  
+                            <goal>copy-resources</goal>  
+                        </goals>  
+                        <configuration>  
+                        	  <resources>  
+			                     <resource>
+			                       <directory>/</directory>
+			                       <includes>
+		                            <include>conf/</include>
+		                            <include>icon/</include>
+		                            <include>AExpert.bat</include>
+		                        </includes>
+			                       <filtering>true</filtering>
+			                     </resource>
+			                   </resources>       
+                            <outputDirectory>  
+                                 ${project.build.directory}/AExpert/
+                            </outputDirectory>  
+                        </configuration>  
+                    </execution>  
+ 				</executions>
+            </plugin>
+            
+            			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+							<zip destfile="${project.build.directory}/AExpert.zip">
+								<fileset dir="${project.build.directory}/AExpert/">
+							      </fileset>
+							</zip>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	
