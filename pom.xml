@@ -123,6 +123,22 @@
                     </execution>  
                 </executions>  
             </plugin>  
+            
+            <plugin>  
+                <artifactId>maven-source-plugin</artifactId>  
+                <version>2.1</version>  
+                <configuration>  
+                    <attach>true</attach>  
+                </configuration>  
+                <executions>  
+                    <execution>  
+                        <phase>compile</phase>  
+                        <goals>  
+                            <goal>jar</goal>  
+                        </goals>  
+                    </execution>  
+                </executions>  
+            </plugin>  
             <plugin>
             	<artifactId>maven-resources-plugin</artifactId>
                 <version>2.5</version>
@@ -167,6 +183,15 @@
 								<fileset dir="${project.build.directory}/AExpert/">
 							      </fileset>
 							</zip>
+							<zip destfile="${project.build.directory}/${project.artifactId}_src.zip">
+								<fileset dir="${basedir}/">
+								<exclude name="${basedir}/.git"></exclude>
+								<exclude name=".gitignore"></exclude>
+								<exclude name=".settings/*"></exclude>
+								<exclude name="target/*"></exclude>
+							      </fileset>
+							</zip>
+							<echo message="${project.artifactId}"></echo>
 							</tasks>
 						</configuration>
 					</execution>
